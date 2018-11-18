@@ -14,34 +14,33 @@ api = Api(app)
 
 
 class Users(Resource):
-    # def __init__(self):
-    #     pass
     def get(self):
         headers = {'Content-Type': 'text/html'}
         conn = db_connect.connect() # connect to database
         query = conn.execute("select id, name from users")
-        users = {'users': [i for i in query.cursor.fetchall()]}
-        return make_response(render_template('index.html', users=users),200,headers)
+        usernames = {'users': [i for i in query.cursor.fetchall()]}
+        query2 = conn.execute("select * from users")
+        users = [i for i in query2.cursor.fetchall()]
+        return make_response(render_template('index.html', usernames=usernames, users=users),200,headers)
 
 
 
 class Ratings(Resource):
-    # def __init__(self):
-    #     pass
     def get(self):
         headers = {'Content-Type': 'text/html'}
         conn = db_connect.connect()
         query = conn.execute("select * from ratings")
 
         ratings = {'ratings': [i for i in query.cursor.fetchall()]}
-        return make_response(render_template('ratings.html', ratings=ratings), 200, headers)
+        # get all users
+        query5 = conn.execute("select * from users")
+        users = [i for i in query5.cursor.fetchall()]
+        return make_response(render_template('ratings.html', users=users, ratings=ratings), 200, headers)
 
 
 class Username(Resource):
-    # def __init__(self):
-    #     pass
-
     def get(self, userid):
+        USERID = userid
         headers = {'Content-Type': 'text/html'}
         conn = db_connect.connect()
 
@@ -69,7 +68,6 @@ class Username(Resource):
             if (user[0] != username['data'][0]['id']):
                 similarities.append([user, euclidean(userA, userX)])
 
-        # similarities.sort(key = lambda x:x[1], reverse = True)
         print(similarities)
         def getSimScore(userid, sims):
             if userid < len(sims):
@@ -77,8 +75,6 @@ class Username(Resource):
             else:
                 return 0
 
-
-        # create array for total ws
         ratingsWithWS = []
         # get weighted score (ws)
         # loop through ratings, check for each rating that user has given, and multiply by her similarity
@@ -121,7 +117,6 @@ class Username(Resource):
             return lambda x: x['similarity'] if x['movie']==movie else 0
 
         # get sum of similarity for all users with matching movies
-        # def getSumOfSimilarity():
 
         movies = sorted(set(map(lambda x: x['movie'], newratings)))
         result = [{'movie':movie, 'sumsim': sum(map(get_sim(movie), newratings)), 'sumws':sum(map(get_ws(movie), newratings))} for movie in movies]
@@ -138,29 +133,33 @@ class Username(Resource):
 
         # exclude movies already seen by user
         def getAlreadySeen(userid):
+            print(userid)
             #loop through ratings
             movies = []
             for rating in ratings:
-                 if rating[0] == userid+1 and any(d['movie'] == rating[1] for d in newresult):
-                     movies.append(rating[1])
+                print("rating[0]")
+                print(rating[0])
+                userid = int(userid)
+                if rating[0] == userid and any(d['movie'] == rating[1] for d in newresult):
+                    print(rating[1])
+                    movies.append(rating[1])
             return movies
 
-        alreadySeen = getAlreadySeen(userid)
+        alreadySeen = getAlreadySeen(USERID)
         newresult[:] = [d for d in newresult if d.get('movie') not in alreadySeen]
 
         newresult.sort(key = lambda x:x['divbysim'], reverse = True)
         print(newresult)
 
-
-
+        print("alreadySeen")
+        print(alreadySeen)
 
         recommended_movies = newresult[:3]
 
+        return make_response(render_template('username.html',users=users, username=username, similarities=similarities, ratingsWithWS=newratings, recommended_movies=recommended_movies), 200, headers)
 
 
-        return make_response(render_template('username.html', username=username, similarities=similarities, ratingsWithWS=newratings, recommended_movies=recommended_movies), 200, headers)
-
-api.add_resource(Users, '/users') # Route_1
+api.add_resource(Users, '/') # Route_1
 api.add_resource(Ratings, '/ratings') # Route_2
 api.add_resource(Username, '/users/<userid>') # Route_3
 

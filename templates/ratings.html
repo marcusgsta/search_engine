@@ -15,7 +15,28 @@
 
 <body role="document">
 <div class="container" role="main">
+    <nav>
+        <ul>
 
+            <li><a href="/ratings">All Ratings</a></li>
+            <li><a href="/">All Users</a></li>
+            <ul>
+
+
+            {% if users %}
+
+            {% for user in users %}
+            <li><a href="/users/{{user[0]}}">{{user[1]}}</a></li>
+
+
+            {% endfor %}
+            {% else %}
+            <p>Couldn't retrieve data</p>
+
+            {% endif %}
+                        </ul>
+        </ul>
+    </nav>
 <div class="row">
     <h1>Ratings</h1>
     <h2>All Ratings</h2>

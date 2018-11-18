@@ -16,6 +16,30 @@
 <body role="document">
 <div class="container" role="main">
 
+    <nav>
+        <ul>
+
+            <li><a href="/ratings">All Ratings</a></li>
+            <li><a href="/">All Users</a></li>
+            <ul>
+
+
+            {% if users %}
+
+            {% for user in users %}
+            <li><a href="/users/{{user[0]}}">{{user[1]}}</a></li>
+
+
+            {% endfor %}
+            {% else %}
+            <p>Couldn't retrieve data</p>
+
+            {% endif %}
+                        </ul>
+        </ul>
+    </nav>
+
+
 <div class="row">
     <h1>Recommendation System for Movies</h1>
     <h2>Username</h2>
@@ -63,26 +87,8 @@
 
             </div>
 
-            <!-- <h2>Weighted Scores</h2>
-
-            {% if ratingsWithWS %}
-            <table>
-                <th>User</th>
-                <th>Similarity</th>
-                <th>Night</th>
-                {% for row in ratingsWithWS %}
-                <tr>
-                <td>{{row}}</td>
-
-                </tr>
-                {% endfor %}
-            </table>
-            {% else %}
-              <p>Couldn't retrieve data</p>
-            {% endif %} -->
-
-        <h2>Movie Recommendations for User </h2>
-        <h3>According to Euclidean Similarity</h3>
+        {% if username %}
+        <h2>Top three recommendations for {{ username.data[0].name }} (Euclidean) </h2>
 
         {% if recommended_movies %}
         <table>
@@ -97,6 +103,7 @@
         {% else %}
         <p>Couldn't retrieve data</p>
 
+        {% endif %}
         {% endif %}
 
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>

@@ -31,18 +31,3 @@ def euclidean(userA, userB):
     # Calculate inverted score
     inv = 1 / (1 + sim)
     return round(inv, 5)
-
-
-# def getTopRated(user):
-#     """
-#     Get top rated movie from a user
-#     """
-#     userid = user[0]
-#     conn = db_connect.connect()
-#     query = conn.execute("select * from ratings where userid =%d " %int(userid))
-#
-#     ratings = {'ratings': [i for i in query.cursor.fetchall()]}
-#
-#     ratings['ratings'].sort(key = lambda x:x[2], reverse = True)
-#
-#     return ratings['ratings'][0]

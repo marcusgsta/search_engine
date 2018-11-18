@@ -16,17 +16,39 @@
 <body role="document">
 <div class="container" role="main">
 
+    <nav>
+        <ul>
+
+            <li><a href="/ratings">All Ratings</a></li>
+            <li><a href="/">All Users</a></li>
+            <ul>
+
+
+            {% if users %}
+
+            {% for user in users %}
+            <li><a href="/users/{{user[0]}}">{{user[1]}}</a></li>
+
+
+            {% endfor %}
+            {% else %}
+            <p>Couldn't retrieve data</p>
+
+            {% endif %}
+                        </ul>
+        </ul>
+    </nav>
+
 <div class="row">
     <h1>Recommendation System for Movies</h1>
     <h2>All Users</h2>
     <div>
 
-        {% if users %}
-          <!-- <h1>{{ users.users[0] }}</h1> -->
+        {% if usernames %}
 <table>
     <th>Id</th>
     <th>Name</th>
-          {% for user in users.users %}
+          {% for user in usernames.users %}
     <tr>
       <td>{{user[0]}}</td>
       <td>{{user[1]}}</td>
