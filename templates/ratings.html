@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Recommendation System for Movies</title>
+    <title>Ratings – Recommendation System for Movies</title>
 
     <link href="{{ url_for('static', filename='lib/bootswatch.css') }}" rel="stylesheet">
 
@@ -17,19 +17,21 @@
 <div class="container" role="main">
 
 <div class="row">
-    <h1>Recommendation System for Movies</h1>
-    <h2>All Users</h2>
+    <h1>Ratings</h1>
+    <h2>All Ratings</h2>
     <div>
 
-        {% if users %}
-          <!-- <h1>{{ users.users[0] }}</h1> -->
+        {% if ratings %}
+
 <table>
-    <th>Id</th>
-    <th>Name</th>
-          {% for user in users.users %}
+    <th>User Id</th>
+    <th>Movie</th>
+    <th>Rating</th>
+          {% for rating in ratings.ratings %}
     <tr>
-      <td>{{user[0]}}</td>
-      <td>{{user[1]}}</td>
+      <td>{{rating[0]}}</td>
+      <td>{{rating[1]}}</td>
+      <td>{{rating[2]}}</td>
     </tr>
   {% endfor %}
 </table>

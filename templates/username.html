@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <title>Recommendation System for Movies</title>
+
+    <link href="{{ url_for('static', filename='lib/bootswatch.css') }}" rel="stylesheet">
+
+    <link rel="stylesheet" href="{{ url_for('static',filename='styles/style.css') }}">
+
+</head>
+
+<body role="document">
+<div class="container" role="main">
+
+<div class="row">
+    <h1>Recommendation System for Movies</h1>
+    <h2>Username</h2>
+    <div>
+
+        {% if username %}
+
+<table>
+    <th>Id</th>
+    <th>Name</th>
+    <tr>
+          <td>{{username.data[0].id}}</td>
+          <td>{{username.data[0].name}}</td>
+      </tr>
+</table>
+
+        {% else %}
+          <p>Couldn't retrieve data</p>
+        {% endif %}
+
+        </div>
+
+        <h2>Similar Users</h2>
+
+        <div>
+
+            {% if similarities %}
+
+        <table>
+
+            <th>Name</th>
+            <th>Similarity</th>
+            {% for sim in similarities %}
+           <tr>
+           <td>{{sim[0][1]}}</td>
+           <td>{{sim[1]}}</td>
+           </tr>
+           {% endfor %}
+
+        </table>
+
+            {% else %}
+              <p>Couldn't retrieve data</p>
+            {% endif %}
+
+            </div>
+
+            <!-- <h2>Weighted Scores</h2>
+
+            {% if ratingsWithWS %}
+            <table>
+                <th>User</th>
+                <th>Similarity</th>
+                <th>Night</th>
+                {% for row in ratingsWithWS %}
+                <tr>
+                <td>{{row}}</td>
+
+                </tr>
+                {% endfor %}
+            </table>
+            {% else %}
+              <p>Couldn't retrieve data</p>
+            {% endif %} -->
+
+        <h2>Movie Recommendations for User </h2>
+        <h3>According to Euclidean Similarity</h3>
+
+        {% if recommended_movies %}
+        <table>
+            <th>Movie</th><th>Score</th>
+            {% for row in recommended_movies %}
+        <tr>
+            <td>{{ row['movie'] }}</td>
+            <td>{{ row['divbysim'] }}</td>
+        </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+        <p>Couldn't retrieve data</p>
+
+        {% endif %}
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
+
+    <!-- Latest compiled and minified JavaScript -->
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+
+</body>
+</html>
