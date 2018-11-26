@@ -1,0 +1,10 @@
+.cluster {
+    border: 1px solid black;
+    margin: 4px;
+    padding: 4px;
+}
+
+.blogname {
+    background-color: aliceblue;
+    padding: 6px;
+}

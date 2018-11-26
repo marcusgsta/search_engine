@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Recommendation System for Movies</title>
+    <title>Clustering</title>
 
     <link href="{{ url_for('static', filename='lib/bootswatch.css') }}" rel="stylesheet">
 
@@ -19,42 +19,18 @@
     <nav>
         <ul>
 
-            <li><a href="/ratings">All Ratings</a></li>
-            <li><a href="/">All Users</a></li>
-            <ul>
-
-
-            {% if users %}
-
-            {% for user in users %}
-            <li><a href="/users/{{user[0]}}">{{user[1]}}</a></li>
-
-
-            {% endfor %}
-            {% else %}
-            <p>Couldn't retrieve data</p>
-
-            {% endif %}
-                        </ul>
+            <li><a href="/kmeans">K-means</a></li>
         </ul>
     </nav>
 
 <div class="row">
-    <h1>Recommendation System for Movies</h1>
-    <h2>All Users</h2>
+    <h1>K-means clustering</h1>
+
     <div>
 
-        {% if usernames %}
-<table>
-    <th>Id</th>
-    <th>Name</th>
-          {% for user in usernames.users %}
-    <tr>
-      <td>{{user[0]}}</td>
-      <td>{{user[1]}}</td>
-    </tr>
-  {% endfor %}
-</table>
+        {% if clust %}
+
+        {{ clust }}
 
         {% else %}
           <p>Couldn't retrieve data</p>

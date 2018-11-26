@@ -1,8 +1,8 @@
-# Recommendation_system
-Recommendation System Webapp
+# Clustering
+## Webapp to demonstrate clusering
 
-Gets recommendation for movies, from a test database,
-according to ratings and Euclidean Similarity
+Sorts a blog database into clusters,
+according to words found
 
 ## Tested with Python 3.6 and MacOs High Sierra
 
@@ -18,4 +18,9 @@ source venv36/bin/activate
 venv36
 python3 server.py
 ```
-### The application runs in the browser on localhost:5000
+### The application runs in the browser on
+localhost:5000/nr_of_iterations
+for example localhost:5000/4
+
+### OR without manually setting number of iterations:
+localhost:5000/

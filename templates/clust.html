@@ -5,7 +5,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
 
-    <title>Ratings – Recommendation System for Movies</title>
+    <title>Clustering</title>
 
     <link href="{{ url_for('static', filename='lib/bootswatch.css') }}" rel="stylesheet">
 
@@ -15,51 +15,40 @@
 
 <body role="document">
 <div class="container" role="main">
-    <nav>
-        <ul>
-
-            <li><a href="/ratings">All Ratings</a></li>
-            <li><a href="/">All Users</a></li>
-            <ul>
 
 
-            {% if users %}
 
-            {% for user in users %}
-            <li><a href="/users/{{user[0]}}">{{user[1]}}</a></li>
-
-
-            {% endfor %}
-            {% else %}
-            <p>Couldn't retrieve data</p>
-
-            {% endif %}
-                        </ul>
-        </ul>
-    </nav>
 <div class="row">
-    <h1>Ratings</h1>
-    <h2>All Ratings</h2>
+    <h1>K-means clustering</h1>
+
     <div>
 
-        {% if ratings %}
+        {% if iters %}
+            <p>Iterations: {{ iters }}</p>
+        {% endif %}
 
-<table>
-    <th>User Id</th>
-    <th>Movie</th>
-    <th>Rating</th>
-          {% for rating in ratings.ratings %}
-    <tr>
-      <td>{{rating[0]}}</td>
-      <td>{{rating[1]}}</td>
-      <td>{{rating[2]}}</td>
-    </tr>
-  {% endfor %}
-</table>
+
+        {% if kclust %}
+
+        {% for cluster in kclust %}
+        <h2>Cluster {{ loop.index }} ({{cluster|length}})</h2>
+
+        <div class="cluster">
+            {% for id in cluster %}
+                <span class="blogname">{{ blognames[id] }}</span>
+            {% endfor %}
+        </div>
+
+        {% endfor %}
 
         {% else %}
           <p>Couldn't retrieve data</p>
         {% endif %}
+
+        <!-- for cluster in kclust:
+            for id in cluster:
+                print(labels[id])
+            print('   ') -->
 
         </div>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
