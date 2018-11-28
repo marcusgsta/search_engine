@@ -21,16 +21,15 @@ def printkclust(kclust,labels):
 class Kmeans(Resource):
     def get(self, iters):
         headers = {'Content-Type': 'text/html'}
-        iters = int(iters)
+        if iters in ('favicon.ico'):
+            print("is favicon")
+            iters = 99
+        else:
+            iters = int(iters)
+
         # read data file
         blognames,words,data = readfile('blogdata.txt')
         kclust = kcluster(data,k=10,nrOfIterations=iters)
-
-
-        # print(blognames)
-        # print(words)
-        # printkclust(kclust,blognames)
-        # drawdendrogram(kclust,blognames,jpeg='blogclust.jpg')
 
 
         return make_response(render_template('clust.html', kclust=kclust, blognames=blognames, iters=iters), 200, headers)
