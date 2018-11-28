@@ -1,5 +1,5 @@
 # Clustering
-## Webapp to demonstrate clusering
+## Webapp to demonstrate clustering
 
 Sorts a blog database into clusters,
 according to words found
