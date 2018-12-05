@@ -100,56 +100,93 @@ def getFrequencyScore(wordId, wordIds):
     return score
 
 
+def getDocumentLocationScore(queryIds, wordIds):
+    score = 0
 
-def search(word):
+    for queryId in queryIds:
+        if queryId in wordIds:
+            score += 1 + wordIds.index(queryId)
+        else:
+            score += 100000
+    return score
+
+
+def search(query):
+    # separate query into list of words
+    words = query.split(' ')
+    words = [word for word in words if len(word) > 0]
+
     # Create result dict for pages (and wordids) that contain searched word
-    wordId = getIdForWord(word)
+    queryIds = [getIdForWord(word) for word in words]
+
     result = {}
 
-    for key, value in pagesWithWordIds.items():
-        if wordId in value:
-            result[key] = value
-            continue
+    for page, ids in pagesWithWordIds.items():
+        for queryId in queryIds:
+            if queryId in ids:
+                # Only add pages we haven't added before
+                if page not in result:
+                    result[page] = ids
+                    continue
     # if search string not found
     if len(result) == 0:
         return False
 
-    score = {'content': {} }
+    score = {'content': {}, 'location': {}, 'total': {} }
     for page, wordIds in result.items():
-        # print(page)
-        score['content'][page] = getFrequencyScore(wordId, wordIds)
+        for queryId in queryIds:
+            freqScore = getFrequencyScore(queryId, wordIds)
+            if freqScore > 0:
+                score['content'][page] = freqScore
 
-    normalized = normalize(score['content'], False)
 
-    # normalized = normalized.sort(reverse=True)
-    sorted_by_score = sorted(normalized.items(), key=lambda x: x[1], reverse=True)
+    for page, wordIds in result.items():
+        locationScore = getDocumentLocationScore(queryIds, wordIds)
+        score['location'][page] = locationScore
 
-    return sorted_by_score[:5]
+
+    score['location'] = normalize(score['location'], True)
+    score['content'] = normalize(score['content'], False)
+
+    # Generate result list
+    resultList = []
+    for page, contentScore in score['content'].items():
+        # score['total'][page] = contentScore + 0.8 * score['location'][page]
+        resultList.append({
+        'url': page,
+        'total': round(contentScore + 0.8 * score['location'][page], 2),
+        'content': round(contentScore, 2),
+        'location': round(0.8 * score['location'][page], 2)
+        })
+
+    resultList = sorted(resultList, key=lambda x: x['total'], reverse=True)
+
+    return resultList[:5]
 
 
 def normalize(scores, smallIsBetter):
     """
-    Inverts smaller values to higher values
-    and scaled between 0 and q
+    Scales values between 0 and 1
     """
     if smallIsBetter:
-        return "hello"
-    #     # Find min value in the array
-    #     min = min(scores)
-    #     # Divide min value by score
-    #     # avoid division by zero
-    #     for i in range(len(scores) - 1):
-    #         scores[i] = min / max(scores[i], 0.00001)
+        # Invert smaller values to higher values
+        # and scale between 0 and 1
+        # Find min value in the array
+        minimum = min(scores.values())
+        # Divide min value by score
+        # avoid division by zero
+        normalized_scores = {}
+        for page, score in scores.items():
+            normalized_scores[page] = minimum / max(score, 0.00001)
+        return normalized_scores
     else:
         # Scale higher values between 0 and 1
         # Find max value in array
-
         maximum = max(scores.values())
-
         # Divide all scores by max value
         normalized_scores = {}
         for page, score in scores.items():
-            normalized_scores[page] = score / maximum
+                normalized_scores[page] = score / maximum
         return normalized_scores
 
 
@@ -191,7 +228,6 @@ class SearchResult(Resource):
         else: result = "empty"
 
 
-        # print(result)
         return make_response(render_template('search_engine.html', result=result, word=query), 200, headers)
 
 

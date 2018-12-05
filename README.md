@@ -3,7 +3,9 @@
 Assignment in Web Intelligence
 
 ## Techniques used
-Python, Flask
+Python 3.6
+Flask (microframework for Python)
+Jinja2 (templating language)
 
 ## Tested with Python 3.6 and MacOs High Sierra
 
@@ -14,7 +16,12 @@ python3.6 -m venv venv36
 source venv36/bin/activate
 ```
 
-### To start web application:
+### You also need to install some Python packages
+```
+pip install Flask flask_restful
+```
+
+### To start web application from terminal:
 ```
 venv36
 python3 server.py

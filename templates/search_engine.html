@@ -7,10 +7,11 @@
 
         <div class="field has-addons">
           <div class="control">
-              <input class="input is-large" type="text" name="query" placeholder="Enter Query Here">
+              <input class="input is-large" type="text" name="query" placeholder="Search String">
+              <p>Separate search strings with space</p>
           </div>
           <div class="control">
-              <input class="button is-large is-primary" type="submit" name="" value="Search">
+              <input class="button is-large is-primary" type="submit" value="Search">
         </div>
 
 </div>
@@ -39,13 +40,15 @@
                 {% endif %}
             </thead>
 
-            <th>Url</th><th>Search Score</th>
+            <th>Link</th><th>Score</th><th>Content</th><th>Location</th>
 
             <tbody>
             {% for page in result %}
            <tr>
-           <td>{{ page[0] }}</td>
-           <td>{{ page[1] }}</td>
+           <td>{{ page['url'] }}</td>
+           <td>{{ page['total'] }}</td>
+           <td>{{ page['content'] }}</td>
+           <td>{{ page['location'] }}</td>
 
            </tr>
            {% endfor %}
