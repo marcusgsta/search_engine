@@ -1,8 +1,9 @@
-# Clustering
-## Webapp to demonstrate clustering
+# Basic Search Engine Web App
 
-Sorts a blog database into clusters,
-according to words found
+Assignment in Web Intelligence
+
+## Techniques used
+Python, Flask
 
 ## Tested with Python 3.6 and MacOs High Sierra
 
@@ -18,10 +19,6 @@ source venv36/bin/activate
 venv36
 python3 server.py
 ```
+
 ### The application runs in the browser on
-localhost:5000/nr_of_iterations
-
-for example localhost:5000/4
-
-### OR without manually setting number of iterations:
 localhost:5000/
