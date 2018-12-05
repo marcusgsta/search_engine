@@ -1,0 +1,67 @@
+{% extends "layout.html" %}
+{% block content %}
+
+<section class="section">
+
+    <form class="" action="/search/{{query}}" method="get" id="search" name="search">
+
+        <div class="field has-addons">
+          <div class="control">
+              <input class="input is-large" type="text" name="query" placeholder="Enter Query Here">
+          </div>
+          <div class="control">
+              <input class="button is-large is-primary" type="submit" name="" value="Search">
+        </div>
+
+</div>
+
+    </form>
+
+</section>
+
+
+
+<section class="section">
+
+
+    {% if result == "empty" %}
+        <p>No Search String Specified</p>
+    {% elif result %}
+
+
+<div class="columns">
+<div class="column is-5">
+
+        <table class="table is-striped is-hoverable">
+            <thead>
+                {% if word %}
+                <h2 class="title is-4">Search Result for: "{{ word }}" </h2>
+                {% endif %}
+            </thead>
+
+            <th>Url</th><th>Search Score</th>
+
+            <tbody>
+            {% for page in result %}
+           <tr>
+           <td>{{ page[0] }}</td>
+           <td>{{ page[1] }}</td>
+
+           </tr>
+           {% endfor %}
+            </tbody>
+        </table>
+
+
+
+</div><!-- column is-5 -->
+</div> <!-- columns -->
+
+
+
+{% else %}
+  <p>Search String Not Found</p>
+{% endif %}
+</section>
+
+{% endblock %}
