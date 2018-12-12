@@ -49,7 +49,6 @@ def createIndex():
     # Create page objects
     pages = createPages(urls)
     # Convert words to ids and store in dict with unique words 'wordToId'
-    # Also store in dict pagesWithWordIds
 
     pagesDict = []
     for key, value in pages.items():

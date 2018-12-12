@@ -15,22 +15,10 @@ def createLinkIndex(listOfDicts):
         links = readfile('wikipedia/Links/' + page['url'])
         # if not any(d['links'] == links for d in listOfDicts):
         page['links'] = links
-        
+
         # decode urls
         page['url'] = unquote(page['url'])
     return listOfDicts
-
-
-# def getUrls(prefix, path):
-#     """
-#     Gets all filenames in directory (path)
-#     """
-#     # urls = [prefix + url for url in os.listdir(path)]
-#     urls = []
-#     for url in os.listdir(path):
-#         urls.append(prefix + url)
-#         # urls.append(unquote(prefix + url))
-#     return urls
 
 
 def readfile(file):
@@ -68,15 +56,12 @@ def iteratePR(url, pages):
     counter = 0
     ls = 0
 
-    # print(url)
     for page in pages:
         if url != page['url']:
             if url in page['links']:
                 pr += page['pageRank'] / len(page['links'])
                 counter += 1
                 ls += len(page['links'])
-    # pr = 0.85 * pr + 0.15
-    # print(counter)
-    # print(ls)
+
     pr = 0.15 + 0.85 * pr
     return pr
