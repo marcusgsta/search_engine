@@ -40,7 +40,7 @@
                 {% endif %}
             </thead>
 
-            <th>Link</th><th>Score</th><th>Content</th><th>Location</th>
+            <th>Link</th><th>Score</th><th>Content</th><th>Location</th><th>PageRank</th>
 
             <tbody>
             {% for page in result %}
@@ -49,6 +49,7 @@
            <td>{{ page['total'] }}</td>
            <td>{{ page['content'] }}</td>
            <td>{{ page['location'] }}</td>
+           <td>{{ page['pageRank'] }}</td>
 
            </tr>
            {% endfor %}
