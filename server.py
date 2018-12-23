@@ -3,6 +3,7 @@ from flask import Flask, request, jsonify, render_template, make_response
 from flask_restful import Resource, Api
 import os
 from pageRank import *
+from math import ceil
 from urllib.parse import unquote
 
 
@@ -10,11 +11,11 @@ app = Flask(__name__, template_folder='templates')
 api = Api(app)
 
 # index
-pagesWithWordIds = []
+# pagesWithWordIds = []
 # index with links
 pagesWithLinks = []
 # List of dictionaries for everything
-pagesWithDicts = []
+# pagesWithDicts = []
 # dict for unique word and their id's
 wordToId = {}
 
@@ -46,21 +47,10 @@ def createIndex():
     games_urls = getUrls('Games/', 'wikipedia/Words/Games')
     programming_urls = getUrls('Programming/', 'wikipedia/Words/Programming')
     urls = games_urls + programming_urls
-    # Create page objects
+
     pages = createPages(urls)
-    # Convert words to ids and store in dict with unique words 'wordToId'
 
-    pagesDict = []
-    for key, value in pages.items():
-        listOfIds = []
-        for word in value:
-            listOfIds.append(getIdForWord(word))
-
-        pagesDict.append( {'url': key,
-                            'wordIds': listOfIds,
-                            'links': [],
-                            'pageRank': 1.0} )
-    return pagesDict
+    return pages
 
 
 def readfile(file):
@@ -75,10 +65,8 @@ def getUrls(prefix, path):
     """
     Gets all filenames in directory (path)
     """
-    # urls = [prefix + url for url in os.listdir(path)]
     urls = []
     for url in os.listdir(path):
-        # urls.append(unquote(prefix + url))
         urls.append(prefix + url)
     return urls
 
@@ -86,29 +74,30 @@ def getUrls(prefix, path):
 def createPages(urls):
     """
     Loops through list of files
-    and stores a dictionary with
-    page urls mapped to the words in each page
+    and stores a dictionary of dictionaries, where
+    'url' : {}
+    wordIds, empty list of links and pageRank start value
     """
     pages = {}
     for url in urls:
-        wordIds = readfile('wikipedia/Words/' + url)
-        # if wordIds not in pages.values():
-        pages[url] = wordIds
+        words = readfile('wikipedia/Words/' + url)
+        wordIds = []
+        for word in words:
+            wordIds.append(getIdForWord(word))
+
+        pages[url] = {
+                'wordIds': wordIds,
+                'links': [],
+                'pageRank': 1.0
+                }
     return pages
 
 
-
-# Create index
-# in format [ { 'url': url, 'wordIds': wordIds, 'links': [], 'pageRank': 1.0}]
+# Create index dict of dicts: {'url': { } }
 pagesIndex = createIndex()
-# Get an array of dicts in format:
-# [ {'url' : url, 'links': links, pageRank: 'pageRank'}]
-# pagesWithLinks = createLinkIndex()
 pagesWithLinks = createLinkIndex(pagesIndex)
+pageRanks = calculatePageRank(pagesWithLinks)
 
-
-for page in pagesWithLinks:
-    page['url'] = page['url'].split('/')[1]
 
 # Functions to execute search in index
 
@@ -142,18 +131,18 @@ def search(query):
 
     result = {}
 
-    for page in pagesWithLinks:
+    for url, dict in pagesIndex.items():
+    # for page in pageRanks:
         for queryId in queryIds:
-            if queryId in page['wordIds']:
+            if queryId in dict['wordIds']:
+            # if queryId in page['wordIds']:
                 # Only add pages we haven't added before
-                if page['url'] not in result:
-                    result[page['url']] = page['wordIds']
-                    continue
+                # if url not in result:
+                result[url] = dict['wordIds']
+                continue
     # if search string not found
     if len(result) == 0:
         return False
-
-
 
     score = {'content': {},
              'location': {},
@@ -172,23 +161,14 @@ def search(query):
         locationScore = getDocumentLocationScore(queryIds, wordIds)
         score['location'][page] = locationScore
 
-    # Get all page ranks
-    pageRanks = calculatePageRank(pagesWithLinks)
-
-    # Convert/clean urls
-    for p in pageRanks:
-        print(p['url'])
-        p['url'] = p['url'].split('/wiki/')[1]
-
-
     # Get page ranks for result
     for page, wordIds in result.items():
-        for p in pageRanks:
-            if page == p['url']:
-                score['pageRank'][page] = p['pageRank']
+        for url, dict in pageRanks.items():
+            if page == url:
+                score['pageRank'][page] = dict['pageRank']
                 break
 
-    score['pageRank'] = normalize(score['pageRank'], False)
+    score['pageRank'] = normalize(score['pageRank'], False, True)
     score['location'] = normalize(score['location'], True)
     score['content'] = normalize(score['content'], False)
 
@@ -197,22 +177,24 @@ def search(query):
     for page, contentScore in score['content'].items():
         total = round(contentScore +
                     0.5 * score['pageRank'][page] +
-                    0.8 * score['location'][page], 2)
+                    0.8 * score['location'][page], 3)
 
         resultList.append({
         'url': page,
         'total': total,
-        'content': round(contentScore, 2),
-        'location': round(0.8 * score['location'][page], 2),
-        'pageRank': round(0.5 * score['pageRank'][page], 2)
+        'content': round(contentScore, 3),
+        'location': round(0.8 * score['location'][page], 3),
+        'pageRank': round(0.5 * score['pageRank'][page], 3),
+        'cleanUrl': unquote(page)
         })
 
     resultList = sorted(resultList, key=lambda x: x['total'], reverse=True)
 
+
     return resultList[:5]
 
 
-def normalize(scores, smallIsBetter):
+def normalize(scores, smallIsBetter, isPageRank=False):
     """
     Scales values between 0 and 1
     """
@@ -220,7 +202,10 @@ def normalize(scores, smallIsBetter):
         # Invert smaller values to higher values
         # and scale between 0 and 1
         # Find min value in the array
-        minimum = min(scores.values())
+        if isPageRank:
+            minimum = min(d['pageRank'] for d in pageRanks.values())
+        else:
+            minimum = min(scores.values())
         # Divide min value by score
         # avoid division by zero
         normalized_scores = {}
@@ -230,7 +215,10 @@ def normalize(scores, smallIsBetter):
     else:
         # Scale higher values between 0 and 1
         # Find max value in array
-        maximum = max(scores.values())
+        if isPageRank:
+            maximum = max(d['pageRank'] for d in pageRanks.values())
+        else:
+            maximum = max(scores.values())
         # Divide all scores by max value
         normalized_scores = {}
         for page, score in scores.items():

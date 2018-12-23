@@ -2,23 +2,18 @@
 import os
 from urllib.parse import unquote
 
-
-
-def createLinkIndex(listOfDicts):
+def createLinkIndex(dictOfDicts):
     """
-    Creates a searcheable index from a list of wikipedia articles.
+    Creates a searchable index from a list of wikipedia articles.
     Loops through list of files
-    and stores a list of dictionaries with
+    and stores a dict of dictionaries with
     urls, links and pageRanks (set to inital value of 1.0)
     """
-    for page in listOfDicts:
-        links = readfile('wikipedia/Links/' + page['url'])
-        # if not any(d['links'] == links for d in listOfDicts):
-        page['links'] = links
+    for url, dict in dictOfDicts.items():
+        links = readfile('wikipedia/Links/' + url)
+        dict['links'] = links
 
-        # decode urls
-        page['url'] = unquote(page['url'])
-    return listOfDicts
+    return dictOfDicts
 
 
 def readfile(file):
@@ -33,35 +28,26 @@ def readfile(file):
 # Iterate over all pages for a number of iterations
 def calculatePageRank(pages):
     """
-    @param list with dictionaries
-
+    @param dict of dictionaries
     """
-    for page in pages:
-        page['url'] = "/wiki/" + page['url']
 
     MAX_ITERATIONS = 20
     for i in range(MAX_ITERATIONS):
-        for page in pages:
+        for url, dict in pages.items():
             # every page url is checked with all links in all pages
             # to find inbound links
-            pr = iteratePR(page['url'], pages)
-            page['pageRank'] = pr
-
+            pr = iteratePR(url, pages)
+            dict['pageRank'] = pr
     return pages
 
 
-def iteratePR(url, pages):
+def iteratePR(this_url, pages):
     # Calculate page rank value
     pr = 0
-    counter = 0
-    ls = 0
-
-    for page in pages:
-        if url != page['url']:
-            if url in page['links']:
-                pr += page['pageRank'] / len(page['links'])
-                counter += 1
-                ls += len(page['links'])
-
-    pr = 0.15 + 0.85 * pr
-    return pr
+    for url, dict in pages.items():
+        # if url != this_url:
+        link_url = "/wiki/" + unquote(this_url).split('/')[1]
+        if link_url in dict['links']:
+            pr += dict['pageRank'] / len(dict['links'])
+            # pr += 0.85 * dict['pageRank'] / len(dict['links'])
+    return 0.85 * pr + 0.15
